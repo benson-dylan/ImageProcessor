@@ -8,6 +8,7 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.scene.control.Button;
@@ -57,7 +58,15 @@ public class App extends Application {
                imageView.setImage(image);
            }
         });
-        rootNode.setBottom(getImageButton);
+
+        Button zoomButton = new Button("Zoom");
+        zoomButton.setAlignment(Pos.CENTER_RIGHT);
+        zoomButton.setStyle("-fx-alignment: center;");
+
+        HBox buttonBox = new HBox(10);
+        buttonBox.setAlignment(Pos.CENTER);
+        buttonBox.getChildren().addAll(getImageButton, zoomButton);
+        rootNode.setBottom(buttonBox);
 
         return new Scene(rootNode, width, height);
     }
