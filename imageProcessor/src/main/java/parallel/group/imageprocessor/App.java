@@ -13,11 +13,17 @@ import javafx.stage.Stage;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.stage.Screen;
+import javafx.scene.image.PixelReader;
+import javafx.scene.paint.Color;
+
+import java.awt.image.DataBufferInt;
+import java.awt.image.BufferedImage;
+import java.awt.image.WritableRaster;
 import java.io.File;
 
 public class App extends Application {
 
+    private Image selectedImage;
     private Scene createStartScene(Stage primaryStage)
     {
         int width = 720;
@@ -54,6 +60,51 @@ public class App extends Application {
         rootNode.setBottom(getImageButton);
 
         return new Scene(rootNode, width, height);
+    }
+
+    private BufferedImage convertToBufferedImg(Image image)
+    {
+        int width = (int) image.getWidth();
+        int height = (int) image.getHeight();
+        BufferedImage buffImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        WritableRaster raster = buffImg.getRaster();
+
+        PixelReader pixelReader = image.getPixelReader();
+        int[] pixels =new int[width * height];
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                Color color = pixelReader.getColor(x, y);
+                int argb = (int) (color.getOpacity() * 255) << 24 |
+                           (int) (color.getRed() * 255) << 16 |
+                           (int) (color.getGreen() * 255) << 8 |
+                           (int) (color.getBlue() * 255);
+                pixels[y * width + x] = argb;
+            }
+        }
+
+        raster.setDataElements(0, 0, width, height, pixels);
+        return buffImg;
+    }
+
+    private void setSelectedImage(Image image)
+    {
+        this.selectedImage = image;
+    }
+
+    private void Zoom()
+    {
+        if (this.selectedImage != null)
+        {
+            BufferedImage image = convertToBufferedImg(this.selectedImage);
+            Zoom zoomFunction = new Zoom(image);
+        }
+        else
+        {
+            System.out.println("Image has not been selected.");
+        }
     }
     @Override
     public void start(Stage primaryStage) throws Exception {
