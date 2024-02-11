@@ -3,6 +3,8 @@ package parallel.group.imageprocessor;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.layout.Border;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
@@ -18,8 +20,6 @@ public class App extends Application {
 
     private Scene createStartScene(Stage primaryStage)
     {
-        Screen screen = Screen.getPrimary();
-        Rectangle2D bounds = screen.getVisualBounds();
         int width = 720;
         int height = 720;
         BorderPane rootNode = new BorderPane();
@@ -28,11 +28,14 @@ public class App extends Application {
         imageView.setPreserveRatio(true);
         imageView.setFitWidth(1000);
         imageView.setFitHeight(600);
-        BorderPane.setAlignment(imageView, Pos.CENTER);
+        BorderPane.setAlignment(imageView, Pos.CENTER_LEFT);
 
         rootNode.setCenter(imageView);
 
         Button getImageButton = new Button("Open Image");
+        getImageButton.setAlignment(Pos.CENTER_LEFT);
+        getImageButton.setMinSize(150, 30);
+        getImageButton.setStyle("-fx-alignment: center;");
         getImageButton.setOnAction(event -> {
            FileChooser fileChooser = new FileChooser();
            fileChooser.setTitle("Select Image File");
@@ -50,7 +53,7 @@ public class App extends Application {
         });
         rootNode.setBottom(getImageButton);
 
-        return new Scene(rootNode, bounds.getWidth(), bounds.getHeight());
+        return new Scene(rootNode, width, height);
     }
     @Override
     public void start(Stage primaryStage) throws Exception {
