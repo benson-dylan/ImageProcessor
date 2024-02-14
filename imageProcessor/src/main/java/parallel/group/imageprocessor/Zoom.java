@@ -11,4 +11,10 @@ public class Zoom {
     {
         this.image = image;
     }
+
+    public void printDimensions()
+    {
+        System.out.println("Height: " + image.getHeight());
+        System.out.println("Width: " + image.getWidth());
+    }
 }
