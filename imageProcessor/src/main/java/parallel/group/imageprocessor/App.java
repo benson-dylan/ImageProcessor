@@ -22,20 +22,23 @@ import java.io.File;
 
 public class App extends Application {
     private Image selectedImage;
+    private ImageView imageView;
     private BorderPane rootNode;
+    private int windowHeight;
+    private int windowWidth;
+
+    private void initWindow()
+    {
+        this.windowHeight = 720;
+        this.windowWidth = 720;
+        this.rootNode = new BorderPane();
+    }
+
     private Scene createStartScene(Stage primaryStage)
     {
-        int width = 720;
-        int height = 720;
-        rootNode = new BorderPane();
-
-        ImageView imageView = new ImageView();
-        imageView.setPreserveRatio(true);
-        imageView.setFitWidth(1000);
-        imageView.setFitHeight(600);
-        BorderPane.setAlignment(imageView, Pos.CENTER_LEFT);
-
-        rootNode.setCenter(imageView);
+        initWindow();
+        initImageView();
+        this.rootNode.setCenter(imageView);
 
         Button getImageButton = new Button("Open Image");
         getImageButton.setAlignment(Pos.CENTER_LEFT);
@@ -53,7 +56,7 @@ public class App extends Application {
            if (selectedFile != null)
            {
                this.selectedImage = new Image(selectedFile.toURI().toString());
-               imageView.setImage(this.selectedImage);
+               setImageView(this.selectedImage);
            }
         });
 
@@ -67,7 +70,24 @@ public class App extends Application {
         buttonBox.getChildren().addAll(getImageButton, zoomButton);
         rootNode.setBottom(buttonBox);
 
-        return new Scene(rootNode, width, height);
+        return new Scene(rootNode, this.windowWidth, this.windowHeight);
+    }
+
+    private void initImageView()
+    {
+        this.imageView = new ImageView();
+        imageView.setPreserveRatio(true);
+        imageView.setFitWidth(1000);
+        imageView.setFitHeight(600);
+    }
+
+    private ImageView getImageView()
+    {
+        return this.imageView;
+    }
+    private void setImageView(Image image)
+    {
+        this.imageView.setImage(image);
     }
 
     private BufferedImage convertToBufferedImg(Image image)
@@ -114,11 +134,6 @@ public class App extends Application {
         return writableImg;
     }
 
-    private void updateImageView()
-    {
-
-    }
-
     private void setSelectedImage(Image image)
     {
         this.selectedImage = image;
@@ -131,7 +146,7 @@ public class App extends Application {
             BufferedImage image = convertToBufferedImg(this.selectedImage);
             Zoom zoomFunction = new Zoom(image);
             zoomFunction.printDimensions();
-            setSelectedImage(new Image("file:smilingbucktooth.jpg"));
+            setImageView(new Image("file:smilingbucktooth.jpg"));
         }
         else
         {
