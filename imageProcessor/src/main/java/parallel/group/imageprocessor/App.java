@@ -3,6 +3,8 @@ package parallel.group.imageprocessor;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.image.*;
 import javafx.scene.layout.Border;
 import javafx.scene.text.TextAlignment;
@@ -63,7 +65,7 @@ public class App extends Application {
         Button zoomButton = new Button("Zoom");
         zoomButton.setAlignment(Pos.CENTER_RIGHT);
         zoomButton.setStyle("-fx-alignment: center;");
-        zoomButton.setOnAction(event -> Zoom());
+        zoomButton.setOnAction(event -> zoomPopUp());
 
         HBox buttonBox = new HBox(10);
         buttonBox.setAlignment(Pos.CENTER);
@@ -77,8 +79,6 @@ public class App extends Application {
     {
         this.imageView = new ImageView();
         imageView.setPreserveRatio(true);
-        imageView.setFitWidth(1000);
-        imageView.setFitHeight(600);
     }
 
     private ImageView getImageView()
@@ -139,14 +139,54 @@ public class App extends Application {
         this.selectedImage = image;
     }
 
-    private void Zoom()
+    private void zoomPopUp()
+    {
+        Stage popUp = new Stage();
+        popUp.setTitle("Zoom Image");
+
+        BorderPane pane = new BorderPane();
+        pane.setTop(new Label("Enter Zoom Percentage: "));
+
+        TextField zoomPercent = new TextField();
+        pane.setCenter(zoomPercent);
+
+        Button cancelButton = new Button("Cancel");
+        cancelButton.setOnAction(event -> popUp.close());
+
+        Button submitButton = new Button("Submit");
+        submitButton.setOnAction(event -> {
+            double scale = Double.parseDouble(zoomPercent.getText()) / 100;
+            try
+            {
+                Zoom(scale);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+            popUp.close();
+        });
+
+        HBox buttonBox = new HBox();
+        buttonBox.getChildren().addAll(cancelButton, submitButton);
+        pane.setBottom(buttonBox);
+
+        Scene scene = new Scene(pane, 300, 150);
+        popUp.setScene(scene);
+        popUp.show();
+    }
+
+    private void Zoom(double scale) throws Exception
     {
         if (this.selectedImage != null)
         {
             BufferedImage image = convertToBufferedImg(this.selectedImage);
             Zoom zoomFunction = new Zoom(image);
             zoomFunction.printDimensions();
-            setImageView(new Image("file:smilingbucktooth.jpg"));
+            BufferedImage zoomedImg = zoomFunction.zoom(image, scale);
+            Image updatedImage = convertToJavaFXImg(zoomedImg);
+            setSelectedImage(updatedImage);
+            setImageView(updatedImage);
         }
         else
         {
