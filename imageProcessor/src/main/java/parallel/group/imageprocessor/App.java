@@ -3,6 +3,7 @@ package parallel.group.imageprocessor;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.*;
@@ -67,9 +68,14 @@ public class App extends Application {
         zoomButton.setStyle("-fx-alignment: center;");
         zoomButton.setOnAction(event -> zoomPopUp());
 
+        Button edgeDetectButton = new Button("Detect Edges");
+        edgeDetectButton.setAlignment(Pos.CENTER_RIGHT);
+        edgeDetectButton.setStyle("-fx-alignment: center;");
+        edgeDetectButton.setOnAction(event -> EdgeDetection());
+
         HBox buttonBox = new HBox(10);
         buttonBox.setAlignment(Pos.CENTER);
-        buttonBox.getChildren().addAll(getImageButton, zoomButton);
+        buttonBox.getChildren().addAll(getImageButton, zoomButton, edgeDetectButton);
         rootNode.setBottom(buttonBox);
 
         return new Scene(rootNode, this.windowWidth, this.windowHeight);
@@ -79,6 +85,8 @@ public class App extends Application {
     {
         this.imageView = new ImageView();
         imageView.setPreserveRatio(true);
+        imageView.maxWidth(1280);
+        imageView.maxHeight(720);
     }
 
     private ImageView getImageView()
@@ -185,6 +193,23 @@ public class App extends Application {
             zoomFunction.printDimensions();
             BufferedImage zoomedImg = zoomFunction.zoom(image, scale);
             Image updatedImage = convertToJavaFXImg(zoomedImg);
+            setSelectedImage(updatedImage);
+            setImageView(updatedImage);
+        }
+        else
+        {
+            System.out.println("Image has not been selected.");
+        }
+    }
+
+    private void EdgeDetection()
+    {
+        if (this.selectedImage != null)
+        {
+            BufferedImage image = convertToBufferedImg(this.selectedImage);
+            EdgeDetection edgeDetectFunction = new EdgeDetection(image);
+            BufferedImage edges = edgeDetectFunction.detectEdges();
+            Image updatedImage = convertToJavaFXImg(edges);
             setSelectedImage(updatedImage);
             setImageView(updatedImage);
         }
