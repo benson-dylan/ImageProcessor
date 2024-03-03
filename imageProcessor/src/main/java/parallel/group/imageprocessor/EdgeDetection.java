@@ -23,12 +23,13 @@ public class EdgeDetection {
             2/16f, 4/16f, 2/16f,
             1/16f, 2/16f, 1/16f
         };
+
         BufferedImage blurredImage = applyBlur(grayImage, blurKernel);
         BufferedImage gradientImage = computeGradient(blurredImage);
         BufferedImage suppressedImage = nonMaximumSuppression(gradientImage);
         BufferedImage thresholdImage = doubleThreshold(suppressedImage);
         BufferedImage edges = edgeTracking(thresholdImage);
-        return thresholdImage;
+        return edges;
     }
 
     private static BufferedImage applyBlur(BufferedImage image, float[] kernelData)
@@ -146,14 +147,14 @@ public class EdgeDetection {
                 
                 if (magnitude >= highThreshold)
                 {
-                    thresholdImage.setRGB(x, y, 255 << 16 | 255 << 8 | 255);
+                    thresholdImage.setRGB(x, y, 255 << 24 | 255 << 16 | 255 << 8 | 255);
                 }
                 else if (magnitude >= lowThreshold)
                 {
-                    thresholdImage.setRGB(x, y, 127 << 16 | 127 << 8 | 127);
+                    thresholdImage.setRGB(x, y, 255 << 24 | 127 << 16 | 127 << 8 | 127);
                 }
                 else 
-                    thresholdImage.setRGB(x, y, 0);
+                    thresholdImage.setRGB(x, y, 255 << 24 | 0 << 16 | 0 << 8 | 0);
             }
         }
         return thresholdImage;
@@ -165,48 +166,38 @@ public class EdgeDetection {
 
         BufferedImage edges = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
 
-        int strongEdge = 255;
-        int weakEdge = 127;
+        int strongEdge = 255 << 24 | 255 << 16 | 255 << 8 | 255;
+        int weakEdge = 255 << 24 | 127 << 16 | 127 << 8 | 127;
 
-        boolean[][] visited = new boolean[width][height]; // Track visited pixels
+        System.out.println(strongEdge + " " + weakEdge + " " + 0xFF000000);
 
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                if (getGrayLevel(image.getRGB(x, y)) == strongEdge && !visited[x][y]) { // Check if pixel is strong edge and not visited
-                    edges.setRGB(x, y, strongEdge << 16 | strongEdge << 8 | strongEdge);
-                    trackEdges(image, edges, visited, x, y, strongEdge, weakEdge);
+        for (int x = 1; x < width - 1; x++)
+        {
+            for (int y = 1; y < height - 1; y++)
+            {
+                int pixel = image.getRGB(x, y);
+
+                if (pixel == strongEdge)
+                    edges.setRGB(x, y, strongEdge);
+                else if (pixel == weakEdge)
+                {
+                    if ((image.getRGB(x+1, y-1) == strongEdge) || (image.getRGB(x+1, y) == strongEdge)
+                    || (image.getRGB(x+1, y+1) == strongEdge)
+                    || (image.getRGB(x, y-1) == strongEdge) || (image.getRGB(x, y+1) == strongEdge)
+                    || (image.getRGB(x-1, y-1) == strongEdge) || (image.getRGB(x-1, y) == strongEdge)
+                    || (image.getRGB(x-1, y+1) == strongEdge))
+                    {
+                        edges.setRGB(x, y, strongEdge);
+                    }
+                    else
+                    {
+                        edges.setRGB(x, y, 255 << 24 | 0 << 16 | 0 << 8 | 0);
+                    }
                 }
             }
         }
 
         return edges;
-    }
-
-    private static void trackEdges(BufferedImage image, BufferedImage edges, boolean[][] visited, int x, int y, int strongEdge, int weakEdge) {
-        int width = image.getWidth();
-        int height = image.getHeight();
-
-        // Mark the current pixel as visited
-        visited[x][y] = true;
-
-        // Define the neighborhood offsets
-        int[] dx = {-1, 0, 1, -1, 1, -1, 0, 1};
-        int[] dy = {-1, -1, -1, 0, 0, 1, 1, 1};
-
-        // Traverse through the neighborhood pixels
-        for (int i = 0; i < 8; i++) {
-            int newX = x + dx[i];
-            int newY = y + dy[i];
-
-            // Check if the new coordinates are within the image bounds and not visited
-            if (newX >= 0 && newX < width && newY >= 0 && newY < height && !visited[newX][newY]) {
-                // If the neighboring pixel is a weak edge, recursively track edges
-                if (getGrayLevel(image.getRGB(newX, newY)) == weakEdge) {
-                    edges.setRGB(newX, newY, strongEdge << 16 | strongEdge << 8 | strongEdge);
-                    trackEdges(image, edges, visited, newX, newY, strongEdge, weakEdge);
-                }
-            }
-        }
     }
 
     private static int getGrayLevel(int rgb) {
