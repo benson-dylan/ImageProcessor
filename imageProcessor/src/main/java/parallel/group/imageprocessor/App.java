@@ -67,9 +67,25 @@ public class App extends Application {
         zoomButton.setStyle("-fx-alignment: center;");
         zoomButton.setOnAction(event -> zoomPopUp());
 
+        Button blurButton = new Button("Blur");
+        blurButton.setAlignment(Pos.CENTER_RIGHT);
+        blurButton.setStyle("-fx-alignment: center;");
+        blurButton.setOnAction(event ->{
+            try
+            {
+                Blur();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        });
+
+
+
         HBox buttonBox = new HBox(10);
         buttonBox.setAlignment(Pos.CENTER);
-        buttonBox.getChildren().addAll(getImageButton, zoomButton);
+        buttonBox.getChildren().addAll(getImageButton, zoomButton, blurButton);
         rootNode.setBottom(buttonBox);
 
         return new Scene(rootNode, this.windowWidth, this.windowHeight);
@@ -193,6 +209,24 @@ public class App extends Application {
             System.out.println("Image has not been selected.");
         }
     }
+
+    private void Blur() throws Exception
+    {
+        if (this.selectedImage != null)
+        {
+            BufferedImage image = convertToBufferedImg(this.selectedImage);
+            Blur blurFunction = new Blur(image);
+            BufferedImage blurredImg = blurFunction.blur();
+            Image updatedImage = convertToJavaFXImg(blurredImg);
+            setSelectedImage(updatedImage);
+            setImageView(updatedImage);
+        }
+        else
+        {
+            System.out.println("Image has not been selected.");
+        }
+    }
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         primaryStage = new Stage();
