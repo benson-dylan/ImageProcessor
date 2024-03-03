@@ -19,7 +19,7 @@ public class Blur {
         System.out.println("Attempting to blur...");
         int width = image.getWidth();
         int height = image.getHeight();
-
+        int threshHold = 100000;
         BufferedImage blurredImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
         ExecutorService executor = Executors.newFixedThreadPool(NUM_THREADS);
@@ -34,24 +34,31 @@ public class Blur {
                         ArrayList<Integer> pixels = new ArrayList<Integer>();
                         pixels.add(image.getRGB(x, currentY));
                         if (currentY - 1 > 0)
-                            pixels.add(image.getRGB(x, currentY - 1));
+                            if(pixels.getFirst() - image.getRGB(x, currentY - 1) < -threshHold || pixels.getFirst() - image.getRGB(x, currentY - 1) > threshHold )
+                                pixels.add(image.getRGB(x, currentY - 1));
                         if (currentY + 1 < height)
-                            pixels.add(image.getRGB(x, currentY + 1));
+                            if(pixels.getFirst() - image.getRGB(x, currentY + 1) < -threshHold || pixels.getFirst() - image.getRGB(x, currentY + 1) > threshHold )
+                                pixels.add(image.getRGB(x, currentY + 1));
                         if (x + 1 < width) {
-
-                            pixels.add(image.getRGB(x + 1, currentY));
+                            if(pixels.getFirst() - image.getRGB(x+1, currentY) < -threshHold || pixels.getFirst() - image.getRGB(x+1, currentY) > threshHold )
+                                pixels.add(image.getRGB(x + 1, currentY));
                             if (currentY + 1 < height)
-                                pixels.add(image.getRGB(x + 1, currentY + 1));
+                                if(pixels.getFirst() - image.getRGB(x + 1, currentY + 1) < -threshHold || pixels.getFirst() - image.getRGB(x + 1, currentY + 1) > threshHold )
+                                    pixels.add(image.getRGB(x + 1, currentY + 1));
                             if (currentY - 1 > 0)
-                                pixels.add(image.getRGB(x + 1, currentY - 1));
+                                if(pixels.getFirst() - image.getRGB(x + 1, currentY - 1) < -threshHold || pixels.getFirst() - image.getRGB(x + 1, currentY - 1) > threshHold )
+                                    pixels.add(image.getRGB(x + 1, currentY - 1));
 
                         }
                         if (x - 1 > 0) {
-                            pixels.add(image.getRGB(x - 1, currentY));
+                            if(pixels.getFirst() - image.getRGB(x-1, currentY) < -threshHold || pixels.getFirst() - image.getRGB(x-1, currentY ) > threshHold )
+                                pixels.add(image.getRGB(x - 1, currentY));
                             if (currentY + 1 < height)
-                                pixels.add(image.getRGB(x - 1, currentY + 1));
+                                if(pixels.getFirst() - image.getRGB(x- 1, currentY + 1) < -threshHold || pixels.getFirst() - image.getRGB(x-1, currentY + 1) > threshHold )
+                                    pixels.add(image.getRGB(x - 1, currentY + 1));
                             if (currentY - 1 > 0)
-                                pixels.add(image.getRGB(x - 1, currentY - 1));
+                                if(pixels.getFirst() - image.getRGB(x - 1, currentY - 1) < -threshHold || pixels.getFirst() - image.getRGB(x - 1, currentY - 1) > threshHold )
+                                    pixels.add(image.getRGB(x - 1, currentY - 1));
                         }
                         int pixelRGBAvg = pixelAvg(pixels);
                         blurredImage.setRGB(x, currentY, pixelRGBAvg);
@@ -69,14 +76,41 @@ public class Blur {
         return blurredImage;
     }
 
+    //Colorize, leave commented
+//    private int pixelAvg(ArrayList<Integer> pixels)
+//    {
+//        int pixelRGBAvg = 0;
+//        int count = 0;
+//        for(Integer e : pixels)
+//        {
+//            count++;
+//            pixelRGBAvg += e;
+//        }
+//        pixelRGBAvg /= count;
+//        return pixelRGBAvg;
+//    }
+
     private int pixelAvg(ArrayList<Integer> pixels)
     {
-        int pixelRGBAvg = 0;
-        for(Integer e : pixels)
-        {
-            pixelRGBAvg = e;
+        int alphaSum = 0;
+        int redSum = 0;
+        int greenSum = 0;
+        int blueSum = 0;
+        for (Integer pixel : pixels) {
+            int alpha = (pixel >> 24) & 0xFF;
+            int red = (pixel >> 16) & 0xFF;
+            int green = (pixel >> 8) & 0xFF;
+            int blue = pixel & 0xFF;
+            alphaSum += alpha;
+            redSum += red;
+            greenSum += green;
+            blueSum += blue;
         }
-        pixelRGBAvg /= pixels.size();
-        return pixelRGBAvg;
+        int count = pixels.size();
+        int alphaAvg = alphaSum / count;
+        int redAvg = redSum / count;
+        int greenAvg = greenSum / count;
+        int blueAvg = blueSum / count;
+        return (alphaAvg << 24) | (redAvg << 16) | (greenAvg << 8) | blueAvg;
     }
 }
