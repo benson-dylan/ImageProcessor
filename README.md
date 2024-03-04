@@ -20,6 +20,7 @@
  </ul>
 <h3>Introduction</h3>
 <h3>Problem Statement</h3>
+ <p>We were seeking a solution to potential runtime slowdowns due to complex algorithms running through high resolution images.</p>
 <h3>Related Work</h3>
 <h3>Technique</h3>
 <h3>Evaluation</h3>
