@@ -30,13 +30,13 @@ public class Contour {
 
     public BufferedImage contour() throws Exception
     {
-        System.out.println("Attempting to find countours...");
+        System.out.println("Attempting to find contours...");
 
         BufferedImage contouredImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
         try
         {
-
+            
         }
 
         catch (Exception error)
@@ -49,5 +49,17 @@ public class Contour {
         {
 
         }
+
+        return contouredImage;
     }
+}
+
+private Mat bufferedImageToMat(BufferedImage image)
+{
+
+}
+
+private void matToBufferedImage(Mat mat, BufferedImage iamge)
+{
+
 }
