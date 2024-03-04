@@ -62,6 +62,11 @@ public class App extends Application {
            }
         });
 
+        Button resizeButton = new Button("Resize");
+        resizeButton.setAlignment(Pos.CENTER_RIGHT);
+        resizeButton.setStyle("-fx-alignment: center;");
+        resizeButton.setOnAction(event -> resizePopUp());
+
         Button zoomButton = new Button("Zoom");
         zoomButton.setAlignment(Pos.CENTER_RIGHT);
         zoomButton.setStyle("-fx-alignment: center;");
@@ -81,11 +86,9 @@ public class App extends Application {
             }
         });
 
-
-
         HBox buttonBox = new HBox(10);
         buttonBox.setAlignment(Pos.CENTER);
-        buttonBox.getChildren().addAll(getImageButton, zoomButton, blurButton);
+        buttonBox.getChildren().addAll(resizeButton, getImageButton, zoomButton, blurButton);
         rootNode.setBottom(buttonBox);
 
         return new Scene(rootNode, this.windowWidth, this.windowHeight);
@@ -153,6 +156,67 @@ public class App extends Application {
     private void setSelectedImage(Image image)
     {
         this.selectedImage = image;
+    }
+
+    private void resizePopUp()
+    {
+        Stage popUp = new Stage();
+        popUp.setTitle("Resize Image");
+
+        BorderPane pane = new BorderPane();
+        pane.setTop(new Label("Enter New Image Size: "));
+
+        TextField resizeWidth = new TextField();
+        TextField resizeHeight = new TextField();
+        HBox textFieldBox = new HBox(5);
+        textFieldBox.getChildren().addAll(resizeWidth, resizeHeight);
+        textFieldBox.setAlignment(Pos.CENTER);
+        pane.setCenter(textFieldBox);
+
+        Button cancelButton = new Button("Cancel");
+        cancelButton.setOnAction(event -> popUp.close());
+
+        Button submitButton = new Button("Submit");
+        submitButton.setOnAction(event -> {
+            try
+            {
+                int newWidth = Integer.parseInt(resizeWidth.getText());
+                int newHeight = Integer.parseInt(resizeHeight.getText());
+                Resize(newWidth, newHeight);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+            popUp.close();
+        });
+
+        HBox buttonBox = new HBox(5);
+        buttonBox.getChildren().addAll(cancelButton, submitButton);
+        buttonBox.setAlignment(Pos.CENTER);
+        pane.setBottom(buttonBox);
+
+        Scene scene = new Scene(pane, 300, 150);
+        popUp.setScene(scene);
+        popUp.show();
+    }
+
+    private void Resize(int newWidth, int newHeight) throws Exception
+    {
+        if (this.selectedImage != null)
+        {
+            BufferedImage image = convertToBufferedImg(this.selectedImage);
+            Resize resizeFunction = new Resize(image);
+            resizeFunction.printDimensions();
+            BufferedImage zoomedImg = resizeFunction.resize(image, newWidth, newHeight);
+            Image updatedImage = convertToJavaFXImg(zoomedImg);
+            setSelectedImage(updatedImage);
+            setImageView(updatedImage);
+        }
+        else
+        {
+            System.out.println("Image has not been selected.");
+        }
     }
 
     private void zoomPopUp()
