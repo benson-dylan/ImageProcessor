@@ -41,6 +41,41 @@ public class Contour {
             bufferedImageToMat(image, src);
 
             // convert to grayscale
+            Mat gray = new Mat();
+            Imgproc.cvtColor(src, gray, Imgproc.COLOR_BGR2GRAY);
+
+            // thresholding
+            Imgproc.threshold(gray, gray, 127, 255, Imgproc.THRESH_BINARY);
+
+            // find contours using parallel processing
+            ExecutorService executor = Executors.newFixedThreadPool(NUM_THREADS);
+            List<Future<List<MatOfPoint>>> tasks = new ArrayList<>();
+
+            int rowsPerTask = gray.rows() / NUM_THREADS;
+
+            for (int i = 0; i < NUM_THREADS; ++i) 
+            {
+                int startRow = i * rowsPerTask;
+                int endRow = Math.min(startRow + rowsPerTask, gray.rows());
+                Mat subMat = gray.submat(startRow, endRow);
+                tasks.add(executor.submit(() -> findContoursInRegion(subMat)));
+            }
+
+            List<MatOfPoint> allContours = new ArrayList<>();
+            
+            for (Future<List<MatOfPoint>> task : tasks) 
+            {
+                allContours.addAll(task.get());
+            }
+
+            // draw contours on the contouredImage
+            for (MatOfPoint contour : allContours) 
+            {
+                Imgproc.drawContours(src, Collections.singletonList(contour), -1, new Scalar(0, 255, 0), 2);
+            }
+
+            // convert Mat back to BufferedImage
+            matToBufferedImage(src, contouredImage);
         }
 
         catch (Exception error)
@@ -51,16 +86,22 @@ public class Contour {
 
         finally
         {
-
+            // release resources
+            src.release();
+            gray.release();
         }
 
         return contouredImage;
     }
 }
 
-private List<MatOfPoint> findContours(Mat submat)
+private List<MatOfPoint> findContoursInRegion(Mat submat)
 {
+    List<MatOfPoint> contours = new ArrayList<>();
     
+    Imgproc.findContours(subMat, contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+    
+    return contours;
 }
 
 private Mat bufferedImageToMat(BufferedImage image)
