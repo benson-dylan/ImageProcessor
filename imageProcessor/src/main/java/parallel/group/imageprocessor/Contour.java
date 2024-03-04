@@ -3,11 +3,20 @@ package parallel.group.imageprocessor;
 import java.awt.image.BufferedImage;
 import java.nio.Buffer;
 
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.Scalar;
+import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.highgui.HighGui;
+import org.opencv.imgproc.Imgproc;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class Contour {
@@ -19,13 +28,21 @@ public class Contour {
         this.image = image;
     }
 
-    public BufferedImage contour()
+    public BufferedImage contour() throws Exception
     {
         System.out.println("Attempting to find countours...");
+
+        BufferedImage contouredImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
         try
         {
 
+        }
+
+        catch (Exception error)
+        {
+            System.err.println("Error finding contours: " + error.getMessage());
+            throw error;
         }
 
         finally
