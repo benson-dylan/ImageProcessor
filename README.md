@@ -55,7 +55,20 @@
   </li>
  </ul>
 <h3>Evaluation</h3>
+<ul>
+ <li><p>Discuss time differences even if insignificant.</p></li>
+ <li><p>Discuss samples and resolutions.</p></li>
+ <li><p>Discuss visual accuracy of the outputs at all steps.</p></li>
+</ul>
 <h3>Discussion</h3>
+ <ul>
+  <li><p>Summarize findings</p></li>
+  <li><p>Compare with research</p></li>
+  <li><p>Recommendations for further research</p></li>
+ </ul>
 <h3>Conclusion</h3>
+ <ul>
+  
+ </ul>
 
  
