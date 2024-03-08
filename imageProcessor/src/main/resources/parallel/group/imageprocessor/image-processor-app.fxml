@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="parallel.group.imageprocessor.App">
+   <children>
+      <BorderPane layoutX="-2.0" layoutY="-1.0" prefHeight="400.0" prefWidth="600.0">
+         <bottom>
+            <HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+               <children>
+                  <Button mnemonicParsing="false" text="Select Image" />
+                  <Button mnemonicParsing="false" text="Zoom" />
+                  <Button mnemonicParsing="false" text="Blur" />
+                  <Button mnemonicParsing="false" text="Resize" />
+                  <Button mnemonicParsing="false" text="Edge Detection" textAlignment="CENTER" />
+               </children></HBox>
+         </bottom>
+         <center>
+            <ImageView fitHeight="195.0" fitWidth="325.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER" />
+         </center>
+      </BorderPane>
+   </children>
+</AnchorPane>

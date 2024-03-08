@@ -3,6 +3,6 @@ module parallel.group.imageprocessor {
     requires javafx.fxml;
     requires java.desktop;
 
-    opens parallel.group.imageprocessor to javafx.fxml;
-    exports parallel.group.imageprocessor;
+    opens parallel.group.imageprocessor;
+    // exports parallel.group.imageprocessor;
 }

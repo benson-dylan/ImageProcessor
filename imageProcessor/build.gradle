@@ -26,7 +26,7 @@ tasks.withType(JavaCompile) {
 
 application {
     mainModule = 'parallel.group.imageprocessor'
-    mainClass = 'parallel.group.imageprocessor.HelloApplication'
+    mainClass = 'parallel.group.imageprocessor.App'
 }
 
 javafx {
@@ -55,4 +55,12 @@ jlink {
 
 jlinkZip {
     group = 'distribution'
+}
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'parallel.group.imageprocessor.App'
+        )
+    }
 }
