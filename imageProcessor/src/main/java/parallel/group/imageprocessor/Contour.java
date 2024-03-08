@@ -1,4 +1,4 @@
-//package parallel.group.imageprocessor;
+package parallel.group.imageprocessor;//package parallel.group.imageprocessor;
 //
 //import java.awt.image.BufferedImage;
 //import java.nio.Buffer;
