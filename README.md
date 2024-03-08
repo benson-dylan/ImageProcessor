@@ -2,7 +2,7 @@
 <p>Our project sought to create an application in Java that processes images with parallelized algorithms to increase efficiency</p>
 
 <h2>Compilation Instructions</h2>
-<p>Using IntelliJ by JetBrains the App.java file can be run to test our program. <br> Alternatively we have provided a JAR file so the code can be executed on any device with a Java Dev Kit installed on it.</p>
+<p>Using IntelliJ by JetBrains the App.java file can be run to test our program. It is located in the deepest nest of the src directory <br> Alternatively we have provided a JAR file so the code can be executed on any device with a Java Dev Kit v. 21 installed on it.</p>
 <a href="https://drive.google.com/file/d/1gIt5Cb67hymGHnoERkhxpoQZxkfX-Wdz/view?usp=sharing">Download</a>
 
 <h2>Goals, Challenges, Accomplishments</h2>
