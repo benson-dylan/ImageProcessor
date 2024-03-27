@@ -30,8 +30,8 @@ public class EdgeDetection {
             BufferedImage gradientImage = parallelComputeGradient(blurredImage, executor, rowsPerRegion);
             BufferedImage suppressedImage = parallelNonMaximumSuppression(gradientImage, executor, rowsPerRegion);
             BufferedImage thresholdImage = parallelDoubleThreshold(suppressedImage, executor, rowsPerRegion);
-            BufferedImage edges = edgeTracking(thresholdImage);
-            return thresholdImage;
+            BufferedImage edges = parallelEdgeTracking(thresholdImage, executor, rowsPerRegion);
+            return edges;
         }
         finally
         {
@@ -275,11 +275,29 @@ public class EdgeDetection {
 //        return thresholdImage;
 //    }
 
-    private static BufferedImage edgeTracking(BufferedImage image) {
-        int width = image.getWidth();
-        int height = image.getHeight();
+    private BufferedImage parallelEdgeTracking(BufferedImage image, ExecutorService executor, int rowsPerRegion) {
+        BufferedImage result = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
+        try {
+            for (int startY = 0; startY < image.getHeight(); startY += rowsPerRegion) {
+                final int regionStartY = startY;
+                final int regionEndY = Math.min(regionStartY + rowsPerRegion, image.getHeight());
+                executor.submit(() -> {
+                    edgeTracking(image, result, regionStartY, regionEndY);
+                });
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
 
-        BufferedImage edges = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
+    private void edgeTracking(BufferedImage source, BufferedImage destination, int startY, int endY) {
+        int width = source.getWidth();
+        int height = source.getHeight();
+
+        int padding = (endY - startY) / 2; // Adjust as needed
+        int startYWithPadding = Math.max(0, startY - padding);
+        int endYWithPadding = Math.min(height - 1, endY + padding);
 
         int strongEdge = 255 << 24 | 255 << 16 | 255 << 8 | 255;
         int weakEdge = 255 << 24 | 127 << 16 | 127 << 8 | 127;
@@ -288,32 +306,70 @@ public class EdgeDetection {
 
         for (int x = 1; x < width - 1; x++)
         {
-            for (int y = 1; y < height - 1; y++)
+            for (int y = startYWithPadding; y < endYWithPadding; y++)
             {
-                int pixel = image.getRGB(x, y);
+                int pixel = source.getRGB(x, y);
 
                 if (pixel == strongEdge)
-                    edges.setRGB(x, y, strongEdge);
+                    destination.setRGB(x, y, strongEdge);
                 else if (pixel == weakEdge)
                 {
-                    if ((image.getRGB(x+1, y-1) == strongEdge) || (image.getRGB(x+1, y) == strongEdge)
-                    || (image.getRGB(x+1, y+1) == strongEdge)
-                    || (image.getRGB(x, y-1) == strongEdge) || (image.getRGB(x, y+1) == strongEdge)
-                    || (image.getRGB(x-1, y-1) == strongEdge) || (image.getRGB(x-1, y) == strongEdge)
-                    || (image.getRGB(x-1, y+1) == strongEdge))
+                    if ((source.getRGB(x+1, y-1) == strongEdge) || (source.getRGB(x+1, y) == strongEdge)
+                    || (source.getRGB(x+1, y+1) == strongEdge)
+                    || (source.getRGB(x, y-1) == strongEdge) || (source.getRGB(x, y+1) == strongEdge)
+                    || (source.getRGB(x-1, y-1) == strongEdge) || (source.getRGB(x-1, y) == strongEdge)
+                    || (source.getRGB(x-1, y+1) == strongEdge))
                     {
-                        edges.setRGB(x, y, strongEdge);
+                        destination.setRGB(x, y, strongEdge);
                     }
                     else
                     {
-                        edges.setRGB(x, y, 255 << 24 | 0 << 16 | 0 << 8 | 0);
+                        destination.setRGB(x, y, 255 << 24 | 0 << 16 | 0 << 8 | 0);
                     }
                 }
             }
         }
-
-        return edges;
     }
+
+//    private static BufferedImage edgeTracking(BufferedImage image) {
+//        int width = image.getWidth();
+//        int height = image.getHeight();
+//
+//        BufferedImage edges = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
+//
+//        int strongEdge = 255 << 24 | 255 << 16 | 255 << 8 | 255;
+//        int weakEdge = 255 << 24 | 127 << 16 | 127 << 8 | 127;
+//
+//        System.out.println(strongEdge + " " + weakEdge + " " + 0xFF000000);
+//
+//        for (int x = 1; x < width - 1; x++)
+//        {
+//            for (int y = 1; y < height - 1; y++)
+//            {
+//                int pixel = image.getRGB(x, y);
+//
+//                if (pixel == strongEdge)
+//                    edges.setRGB(x, y, strongEdge);
+//                else if (pixel == weakEdge)
+//                {
+//                    if ((image.getRGB(x+1, y-1) == strongEdge) || (image.getRGB(x+1, y) == strongEdge)
+//                    || (image.getRGB(x+1, y+1) == strongEdge)
+//                    || (image.getRGB(x, y-1) == strongEdge) || (image.getRGB(x, y+1) == strongEdge)
+//                    || (image.getRGB(x-1, y-1) == strongEdge) || (image.getRGB(x-1, y) == strongEdge)
+//                    || (image.getRGB(x-1, y+1) == strongEdge))
+//                    {
+//                        edges.setRGB(x, y, strongEdge);
+//                    }
+//                    else
+//                    {
+//                        edges.setRGB(x, y, 255 << 24 | 0 << 16 | 0 << 8 | 0);
+//                    }
+//                }
+//            }
+//        }
+//
+//        return edges;
+//    }
 
     private static int getGrayLevel(int rgb) {
         // Extract the red, green, and blue components
