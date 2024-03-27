@@ -35,29 +35,26 @@ public class Sharpen {
                 {0, -1, 0}
         };
 
-        try{
-
+        try {
             Future<?>[] futures = new Future[height];
 
-            for (int y = 1; y < height - 1; y++) {
-
+            for (int y = 0; y < height; y++) {
                 final int Y = y;
-
                 futures[y] = executor.submit(() -> {
-
-                    for (int x = 1; x < width - 1; x++) {
+                    for (int x = 0; x < width; x++) {
                         int sumR = 0, sumG = 0, sumB = 0;
 
                         for (int ky = -1; ky <= 1; ky++) {
                             for (int kx = -1; kx <= 1; kx++) {
-                                Color pixel = new Color(image.getRGB(x + kx, Y + ky));
+                                int pixelX = Math.min(Math.max(x + kx, 0), width - 1);
+                                int pixelY = Math.min(Math.max(Y + ky, 0), height - 1);
+                                Color pixel = new Color(image.getRGB(pixelX, pixelY));
                                 double kernelValue = kernel[ky + 1][kx + 1];
                                 sumR += (int) (pixel.getRed() * kernelValue);
                                 sumG += (int) (pixel.getGreen() * kernelValue);
                                 sumB += (int) (pixel.getBlue() * kernelValue);
                             }
                         }
-
 
                         sumR = Math.min(Math.max(sumR, 0), 255);
                         sumG = Math.min(Math.max(sumG, 0), 255);
@@ -69,19 +66,15 @@ public class Sharpen {
                 });
             }
 
-            for (Future<?> future : futures)
-            {
+            for (Future<?> future : futures) {
                 future.get();
             }
 
-        }catch(Exception e){
-            e.printStackTrace(System.out);
-        }
-        finally
-        {
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
             executor.shutdown();
         }
-
 
         return sharpenedImage;
     }
