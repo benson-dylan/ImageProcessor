@@ -229,10 +229,14 @@ public class ImageProcessor extends Application {
             BufferedImage image = convertToBufferedImg(this.selectedImage);
             Resize resizeFunction = new Resize(image);
             resizeFunction.printDimensions();
+            long startTime = System.currentTimeMillis();
             BufferedImage zoomedImg = resizeFunction.resize(image, newWidth, newHeight);
             Image updatedImage = convertToJavaFXImg(zoomedImg);
+            long endTime = System.currentTimeMillis();
+            long duration = endTime - startTime;
             setSelectedImage(updatedImage);
             setImageView(updatedImage);
+            System.out.println("Time elapsed for zoom: " + duration);
         }
         else
         {
@@ -284,10 +288,14 @@ public class ImageProcessor extends Application {
             BufferedImage image = convertToBufferedImg(this.selectedImage);
             Zoom zoomFunction = new Zoom(image);
             zoomFunction.printDimensions();
+            long startTime = System.currentTimeMillis();
             BufferedImage zoomedImg = zoomFunction.zoom(image, scale);
             Image updatedImage = convertToJavaFXImg(zoomedImg);
+            long endTime = System.currentTimeMillis();
+            long duration = endTime - startTime;
             setSelectedImage(updatedImage);
             setImageView(updatedImage);
+            System.out.println("Time elapsed for zoom: " + duration);
         }
         else
         {
@@ -301,10 +309,14 @@ public class ImageProcessor extends Application {
         {
             BufferedImage image = convertToBufferedImg(this.selectedImage);
             Blur blurFunction = new Blur(image);
+            long startTime = System.currentTimeMillis();
             BufferedImage blurredImg = blurFunction.blur();
             Image updatedImage = convertToJavaFXImg(blurredImg);
+            long endTime = System.currentTimeMillis();
+            long duration = endTime - startTime;
             setSelectedImage(updatedImage);
             setImageView(updatedImage);
+            System.out.println("Time elapsed for blur: " + duration);
         }
         else
         {
@@ -318,10 +330,14 @@ public class ImageProcessor extends Application {
         {
             BufferedImage image = convertToBufferedImg(this.selectedImage);
             Sharpen sharpenFunction = new Sharpen(image);
+            long startTime = System.currentTimeMillis();
             BufferedImage sharpenedImg = sharpenFunction.sharpenImage(5.2);
             Image updatedImage = convertToJavaFXImg(sharpenedImg);
+            long endTime = System.currentTimeMillis();
+            long duration = endTime - startTime;
             setSelectedImage(updatedImage);
             setImageView(updatedImage);
+            System.out.println("Time elapsed for sharpen: " + duration);
         }
         else
         {
