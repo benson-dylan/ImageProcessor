@@ -221,7 +221,7 @@ public class ImageProcessor extends Application {
         popUp.setScene(scene);
         popUp.show();
     }
-
+//Resize
     private void Resize(int newWidth, int newHeight) throws Exception
     {
         if (this.selectedImage != null)
